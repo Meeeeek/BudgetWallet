@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/content_drawer"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="182dp"
+        android:text="$0.00"
+        android:textSize="36sp" />
+
+    <EditText
+        android:id="@+id/locationSpent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/categorySpinner"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="136dp"
+        android:ems="10"
+        android:inputType="textPersonName" />
+
+    <Spinner
+        android:id="@+id/categorySpinner"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_below="@+id/value"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:id="@+id/inputValue"
+        android:layout_width="150sp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="43dp"
+        android:ems="10"
+        android:inputType="numberDecimal"
+        android:layout_below="@+id/categorySpinner"
+        android:layout_alignEnd="@+id/categorySpinner"
+        android:layout_marginEnd="15dp" />
+
+    <TextView
+        android:id="@+id/$"
+        android:layout_width="30sp"
+        android:layout_height="wrap_content"
+        android:text="$"
+        android:textSize="20sp"
+        android:layout_alignBaseline="@+id/inputValue"
+        android:layout_alignBottom="@+id/inputValue"
+        android:layout_toStartOf="@+id/value"
+        android:layout_marginEnd="15dp" />
+
+    <Button
+        android:id="@+id/addValue"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignBottom="@+id/inputValue"
+        android:layout_toEndOf="@+id/categorySpinner"
+        android:onClick="addToCategory"
+        android:text="+" />
+
+    <Button
+        android:id="@+id/subtractValue"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignBottom="@+id/inputValue"
+        android:layout_toStartOf="@+id/categorySpinner"
+        android:onClick="subtractFromCategory"
+        android:text="-" />
+
+</RelativeLayout>

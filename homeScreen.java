@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -15,6 +16,7 @@ public class homeScreen extends Fragment {
 
     Spinner categorySpinner;
     Button addV, subV;
+    EditText inputV, locationS;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -31,11 +33,19 @@ public class homeScreen extends Fragment {
 
         String[] categories = {"All", "Chase", "Acorns", "Cash"};
 
+        categorySpinner = (Spinner) view.findViewById(R.id.categorySpinner);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, categories);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+        categorySpinner.setAdapter(spinnerAdapter);
+
+        inputV = (EditText) view.findViewById(R.id.inputValue);
+        locationS = (EditText) view.findViewById(R.id.locationSpent);
+
         addV = (Button) view.findViewById(R.id.addValue);
         addV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (categorySpinner.getSelectedItem().toString().equals("All")){
+                if (categorySpinner.getSelectedItem().toString().equals("All") || inputV.getText().toString().equals("") || locationS.getText().toString().equals("")){
                     Toast.makeText(getContext(), "All fields must be entered.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -45,16 +55,11 @@ public class homeScreen extends Fragment {
         subV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (categorySpinner.getSelectedItem().toString().equals("All")){
+                if (categorySpinner.getSelectedItem().toString().equals("All") || inputV.getText().toString().equals("") || locationS.getText().toString().equals("")){
                     Toast.makeText(getContext(), "All fields must be entered.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-
-        categorySpinner = (Spinner) view.findViewById(R.id.categorySpinner);
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, categories);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-        categorySpinner.setAdapter(spinnerAdapter);
 
         return view;
     }

@@ -1,0 +1,24 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="michaelkim.budgetingandwalletbased.transactionScreen">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <Spinner
+        android:id="@+id/categorySpinner"
+        android:layout_width="200sp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="98dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <ListView
+        android:id="@+id/listOfTransactions"
+        android:layout_width="300sp"
+        android:layout_height="300sp"
+        android:layout_marginTop="44dp"
+        android:layout_below="@+id/categorySpinner"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>
