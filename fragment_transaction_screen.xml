@@ -16,9 +16,9 @@
 
     <ListView
         android:id="@+id/listOfTransactions"
-        android:layout_width="300sp"
-        android:layout_height="300sp"
-        android:layout_marginTop="44dp"
+        android:layout_width="300dp"
+        android:layout_height="400dp"
         android:layout_below="@+id/categorySpinner"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="42dp" />
 </RelativeLayout>

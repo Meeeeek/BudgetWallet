@@ -14,6 +14,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class categoriesScreen extends Fragment {
@@ -21,6 +22,9 @@ public class categoriesScreen extends Fragment {
     // Global ArrayList value.
     ArrayList<Category> categories;
     ArrayList<String> categoryNames;
+    ArrayList<Transaction> transactions;
+
+    DecimalFormat df = new DecimalFormat("#.00");
 
     // Widget declaration.
     Button addC;
@@ -54,6 +58,13 @@ public class categoriesScreen extends Fragment {
         }
         else{
             categoryNames = ((globalList) getActivity().getApplication()).getNames();
+        }
+
+        if (((globalList) getActivity().getApplication()).getTransactions() == null){
+            transactions = new ArrayList<Transaction>();
+        }
+        else{
+            transactions = ((globalList) getActivity().getApplication()).getTransactions();
         }
     }
 
@@ -110,15 +121,31 @@ public class categoriesScreen extends Fragment {
         }
 
         @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
+        public View getView(final int i, View view, ViewGroup viewGroup) {
             view = getActivity().getLayoutInflater().inflate(R.layout.category_listview, null);
 
             TextView categoryName = (TextView) view.findViewById(R.id.categoryNameText);
-            TextView categoryValue = (TextView) view.findViewById(R.id.categoryValueText);
+            final TextView categoryValue = (TextView) view.findViewById(R.id.categoryValueText);
             Button deleteCategory = (Button) view.findViewById(R.id.deleteCategory);
 
             categoryName.setText(categories.get(i).name);
-            categoryValue.setText("$" + Double.toString(categories.get(i).value));
+            String value = String.format("%.2f", categories.get(i).value);
+            categoryValue.setText("$" + value);
+
+            deleteCategory.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick (View v){
+                    for (int j = 0; j < transactions.size(); j++){
+                        if (transactions.get(j).name.equals(categoryNames.get(i))){
+                            transactions.remove(j);
+                            j--;
+                        }
+                    }
+                    categories.remove(i);
+                    categoryNames.remove(i);
+                    notifyDataSetChanged();
+                }
+            });
 
             return view;
         }

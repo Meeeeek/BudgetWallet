@@ -99,10 +99,12 @@ public class transactionScreen extends Fragment {
             TextView categoryName = (TextView) view.findViewById(R.id.categoryTrans);
             TextView locationName = (TextView) view.findViewById(R.id.locationTrans);
             TextView categoryValue = (TextView) view.findViewById(R.id.valueTrans);
+            TextView date = (TextView) view.findViewById(R.id.dateTrans);
 
             categoryName.setText(transactions.get(i).name);
             locationName.setText(transactions.get(i).location);
             categoryValue.setText(transactions.get(i).value);
+            date.setText(transactions.get(i).date);
 
             return view;
         }

@@ -3,6 +3,8 @@ package michaelkim.budgetingandwalletbased;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +16,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class homeScreen extends Fragment {
 
@@ -22,6 +28,8 @@ public class homeScreen extends Fragment {
     Button addV, subV;
     EditText inputV, locationS;
     TextView totalValue;
+    Calendar calendar = Calendar.getInstance();
+    SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
 
     // Global variable declaration.
     ArrayList<Category> categories;
@@ -59,6 +67,7 @@ public class homeScreen extends Fragment {
         else{
             transactions = ((globalList) getActivity().getApplication()).getTransactions();
         }
+
     }
 
     @Nullable
@@ -71,6 +80,8 @@ public class homeScreen extends Fragment {
         locationS = (EditText) view.findViewById(R.id.locationSpent);
         totalValue = (TextView) view.findViewById(R.id.value);
 
+        inputV.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(7,2)});
+
         categorySpinner = (Spinner) view.findViewById(R.id.categorySpinner);
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, categoryNames);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
@@ -79,7 +90,8 @@ public class homeScreen extends Fragment {
         categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                totalValue.setText("$" + Double.toString(categories.get(position).value));
+                String value = String.format("%.2f", categories.get(position).value);
+                totalValue.setText("$" + value);
             }
 
             @Override
@@ -101,11 +113,12 @@ public class homeScreen extends Fragment {
                 }
                 else{
                     categories.get(selectedPosition).value = categories.get(selectedPosition).value + insertedValue;
-                    transactions.add(new Transaction(categories.get(selectedPosition).name, "+ $" + inputV.getText().toString(), locationS.getText().toString()));
+                    transactions.add(new Transaction(categories.get(selectedPosition).name, "+ $" + inputV.getText().toString(), locationS.getText().toString(), df.format(calendar.getTime())));
                     ((globalList) getActivity().getApplication()).setList(categories);
                     ((globalList) getActivity().getApplication()).setTransactions(transactions);
                     inputV.setText("");
                     locationS.setText("");
+                    totalValue.setText("$" + String.format("%.2f", categories.get(selectedPosition).value));
                 }
             }
         });
@@ -122,16 +135,36 @@ public class homeScreen extends Fragment {
                 }
                 else{
                     categories.get(selectedPosition).value = categories.get(selectedPosition).value - insertedValue;
-                    transactions.add(new Transaction(categories.get(selectedPosition).name, "- $" + inputV.getText().toString(), locationS.getText().toString()));
+                    transactions.add(new Transaction(categories.get(selectedPosition).name, "- $" + inputV.getText().toString(), locationS.getText().toString(), df.format(calendar.getTime())));
                     ((globalList) getActivity().getApplication()).setList(categories);
                     ((globalList) getActivity().getApplication()).setTransactions(transactions);
                     inputV.setText("");
                     locationS.setText("");
+                    totalValue.setText("$" + String.format("%.2f", categories.get(selectedPosition).value));
                 }
             }
         });
 
         return view;
+    }
+
+    public class DecimalDigitsInputFilter implements InputFilter {
+
+        Pattern mPattern;
+
+        public DecimalDigitsInputFilter(int digitsBeforeZero,int digitsAfterZero) {
+            mPattern=Pattern.compile("[0-9]{0," + (digitsBeforeZero-1) + "}+((\\.[0-9]{0," + (digitsAfterZero-1) + "})?)||(\\.)?");
+        }
+
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+
+            Matcher matcher=mPattern.matcher(dest);
+            if(!matcher.matches())
+                return "";
+            return null;
+        }
+
     }
 
 }

@@ -4,30 +4,43 @@
 
     <TextView
         android:id="@+id/locationTrans"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
+        android:layout_marginTop="17dp"
+        android:text="Double Cheeseburger"
+        android:textAlignment="textStart"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="24dp"
-        android:text="TextView" />
+        android:layout_alignStart="@+id/categoryTrans" />
 
     <TextView
         android:id="@+id/categoryTrans"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        android:layout_alignBaseline="@+id/locationTrans"
-        android:layout_alignBottom="@+id/locationTrans"
-        android:layout_centerHorizontal="true" />
+        android:layout_marginStart="21dp"
+        android:layout_marginTop="14dp"
+        android:text="Chase Debit"
+        android:textAlignment="textStart"
+        android:layout_below="@+id/locationTrans"
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:id="@+id/valueTrans"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/categoryTrans"
         android:layout_alignBottom="@+id/categoryTrans"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="34dp"
-        android:text="TextView" />
+        android:layout_alignStart="@+id/dateTrans"
+        android:text="+ $1000.00"
+        android:textAlignment="center" />
+
+    <TextView
+        android:id="@+id/dateTrans"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="05/29/2017"
+        android:textAlignment="center"
+        android:layout_alignBaseline="@+id/locationTrans"
+        android:layout_alignBottom="@+id/locationTrans"
+        android:layout_toEndOf="@+id/locationTrans"
+        android:layout_marginStart="16dp" />
 </RelativeLayout>
