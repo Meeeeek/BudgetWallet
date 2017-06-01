@@ -83,20 +83,33 @@ public class homeScreen extends Fragment {
         inputV.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(7,2)});
 
         categorySpinner = (Spinner) view.findViewById(R.id.categorySpinner);
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, categoryNames);
+        final ArrayList<String> withTotal = new ArrayList<String>();
+        withTotal.add("Total");
+        withTotal.addAll(categoryNames);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, withTotal);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         categorySpinner.setAdapter(spinnerAdapter);
 
         categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                String value = String.format("%.2f", categories.get(position).value);
-                totalValue.setText("$" + value);
+                if (withTotal.get(position).equals("Total") && withTotal.size() != 1){
+                    double total = 0;
+                    for (int i = 0; i < categories.size(); i++){
+                        total = total + categories.get(i).value;
+                    }
+                    totalValue.setText("$" + String.format("%.2f", total));
+                }
+                else if (withTotal.size() == 1){
+                }
+                else {
+                    String value = String.format("%.2f", categories.get(position-1).value);
+                    totalValue.setText("$" + value);
+                }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
             }
 
         });
@@ -105,10 +118,10 @@ public class homeScreen extends Fragment {
         addV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int selectedPosition = categorySpinner.getSelectedItemPosition();
+                int selectedPosition = categorySpinner.getSelectedItemPosition()-1;
                 double insertedValue = Double.parseDouble(inputV.getText().toString());
 
-                if (categorySpinner.getSelectedItem().toString().equals("All") || inputV.getText().toString().equals("") || locationS.getText().toString().equals("")){
+                if (categorySpinner.getSelectedItem().toString().equals("Total") || inputV.getText().toString().equals("") || locationS.getText().toString().equals("")){
                     Toast.makeText(getContext(), "All fields must be entered.", Toast.LENGTH_SHORT).show();
                 }
                 else{
@@ -127,10 +140,10 @@ public class homeScreen extends Fragment {
         subV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int selectedPosition = categorySpinner.getSelectedItemPosition();
+                int selectedPosition = categorySpinner.getSelectedItemPosition()-1;
                 double insertedValue = Double.parseDouble(inputV.getText().toString());
 
-                if (categorySpinner.getSelectedItem().toString().equals("All") || inputV.getText().toString().equals("") || locationS.getText().toString().equals("")){
+                if (categorySpinner.getSelectedItem().toString().equals("Total") || inputV.getText().toString().equals("") || locationS.getText().toString().equals("")){
                     Toast.makeText(getContext(), "All fields must be entered.", Toast.LENGTH_SHORT).show();
                 }
                 else{

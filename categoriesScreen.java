@@ -1,9 +1,13 @@
 package michaelkim.budgetingandwalletbased;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +20,8 @@ import android.widget.Toast;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class categoriesScreen extends Fragment {
 
@@ -28,7 +34,6 @@ public class categoriesScreen extends Fragment {
 
     // Widget declaration.
     Button addC;
-    EditText addField;
 
     // For the listview.
     Context context;
@@ -75,8 +80,6 @@ public class categoriesScreen extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_categories_screen, container, false);
 
-        addField = (EditText) view.findViewById(R.id.categoryField);
-
         listOfCategories = (ListView) view.findViewById(R.id.listOfCategories);
         final categoryAdapter categoryAdapter = new categoryAdapter();
         listOfCategories.setAdapter(categoryAdapter);
@@ -85,18 +88,37 @@ public class categoriesScreen extends Fragment {
         addC.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                String name = addField.getText().toString();
-                if (!categoryNames.contains(name)) {
-                    categories.add(new Category(name, 0.00));
-                    categoryNames.add(name);
-                    ((globalList) getActivity().getApplication()).setList(categories);
-                    ((globalList) getActivity().getApplication()).setNames(categoryNames);
-                    categoryAdapter.notifyDataSetChanged();
-                    addField.setText("");
-                }
-                else{
-                    Toast.makeText(context, "Category Name already exists.", Toast.LENGTH_SHORT).show();
-                }
+                AlertDialog.Builder addDialog = new AlertDialog.Builder(context);
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+
+                final View dialogView = inflater.inflate(R.layout.add_category_dialog, null);
+
+                addDialog.setTitle("Add a Category");
+                addDialog.setView(dialogView)
+                        .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int whichButton) {
+
+                                EditText nameField = (EditText) dialogView.findViewById(R.id.nameAddDialog);
+                                EditText valueField = (EditText) dialogView.findViewById(R.id.valueAddDialog);
+
+                                valueField.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(7,2)});
+
+                                String name = nameField.getText().toString();
+                                String value = valueField.getText().toString();
+                                if (!categoryNames.contains(name)) {
+                                    categories.add(new Category(name, Double.parseDouble(value)));
+                                    categoryNames.add(name);
+                                    ((globalList) getActivity().getApplication()).setList(categories);
+                                    ((globalList) getActivity().getApplication()).setNames(categoryNames);
+                                    categoryAdapter.notifyDataSetChanged();
+                                }
+                                else{
+                                    Toast.makeText(context, "Category Name already exists.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        })
+                        .setNegativeButton("Cancel", null).show();
             }
         });
 
@@ -124,7 +146,7 @@ public class categoriesScreen extends Fragment {
         public View getView(final int i, View view, ViewGroup viewGroup) {
             view = getActivity().getLayoutInflater().inflate(R.layout.category_listview, null);
 
-            TextView categoryName = (TextView) view.findViewById(R.id.categoryNameText);
+            final TextView categoryName = (TextView) view.findViewById(R.id.categoryNameText);
             final TextView categoryValue = (TextView) view.findViewById(R.id.categoryValueText);
             Button deleteCategory = (Button) view.findViewById(R.id.deleteCategory);
 
@@ -135,15 +157,41 @@ public class categoriesScreen extends Fragment {
             deleteCategory.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick (View v){
+                    int transactionCount = 0;
                     for (int j = 0; j < transactions.size(); j++){
                         if (transactions.get(j).name.equals(categoryNames.get(i))){
-                            transactions.remove(j);
-                            j--;
+                            transactionCount++;
                         }
                     }
-                    categories.remove(i);
-                    categoryNames.remove(i);
-                    notifyDataSetChanged();
+                    if (transactionCount > 0) {
+                        AlertDialog.Builder deleteConfirmation = new AlertDialog.Builder(context);
+                        deleteConfirmation.setTitle("Delete this category?");
+                        deleteConfirmation.setMessage("Doing so will delete all transactions under this category.");
+                        deleteConfirmation.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int whichButton) {
+                                for (int j = 0; j < transactions.size(); j++){
+                                    if (transactions.get(j).name.equals(categoryNames.get(i))){
+                                        transactions.remove(j);
+                                        j--;
+                                    }
+                                }
+                                categories.remove(i);
+                                categoryNames.remove(i);
+                                ((globalList) getActivity().getApplication()).setList(categories);
+                                ((globalList) getActivity().getApplication()).setNames(categoryNames);
+                                notifyDataSetChanged();
+                            }
+                        });
+                        deleteConfirmation.setNegativeButton("Cancel", null).show();
+                    }
+                    else{
+                        categories.remove(i);
+                        categoryNames.remove(i);
+                        ((globalList) getActivity().getApplication()).setList(categories);
+                        ((globalList) getActivity().getApplication()).setNames(categoryNames);
+                        notifyDataSetChanged();
+                    }
                 }
             });
 
@@ -151,5 +199,23 @@ public class categoriesScreen extends Fragment {
         }
     }
 
+    public class DecimalDigitsInputFilter implements InputFilter {
+
+        Pattern mPattern;
+
+        public DecimalDigitsInputFilter(int digitsBeforeZero,int digitsAfterZero) {
+            mPattern=Pattern.compile("[0-9]{0," + (digitsBeforeZero-1) + "}+((\\.[0-9]{0," + (digitsAfterZero-1) + "})?)||(\\.)?");
+        }
+
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+
+            Matcher matcher=mPattern.matcher(dest);
+            if(!matcher.matches())
+                return "";
+            return null;
+        }
+
+    }
 
 }

@@ -17,18 +17,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add Category"
-        android:layout_alignTop="@+id/categoryField"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="30dp" />
-
-    <EditText
-        android:id="@+id/categoryField"
-        android:layout_width="160dp"
-        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="24dp"
-        android:layout_marginEnd="32dp"
-        android:layout_toStartOf="@+id/addCategory"
-        android:ems="10"
-        android:inputType="textPersonName" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="18dp" />
+
 </RelativeLayout>

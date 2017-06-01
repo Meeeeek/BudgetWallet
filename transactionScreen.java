@@ -67,7 +67,10 @@ public class transactionScreen extends Fragment {
         listOfTransactions.setAdapter(transAdapter);
 
         Spinner categorySpinner = (Spinner) view.findViewById(R.id.categorySpinner);
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, categoryNames);
+        final ArrayList<String> withTotal = new ArrayList<String>();
+        withTotal.add("Total");
+        withTotal.addAll(categoryNames);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, withTotal);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         categorySpinner.setAdapter(spinnerAdapter);
 
