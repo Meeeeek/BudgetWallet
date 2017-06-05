@@ -24,10 +24,13 @@ import java.util.regex.Pattern;
 
 public class homeScreen extends Fragment {
 
+    // Widget declaration.
     Spinner categorySpinner;
     Button addV, subV;
     EditText inputV, locationS;
     TextView totalValue;
+
+    // Information to grab the current date for transactions.
     Calendar calendar = Calendar.getInstance();
     SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
 
@@ -76,12 +79,15 @@ public class homeScreen extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_home_screen, container, false);
 
+        // Widget instantiation.
         inputV = (EditText) view.findViewById(R.id.inputValue);
         locationS = (EditText) view.findViewById(R.id.locationSpent);
         totalValue = (TextView) view.findViewById(R.id.value);
 
+        // Set the filter so that the EditText's input to 2 decimal places.
         inputV.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(7,2)});
 
+        // Instantiate the category spinner and populate it with its category names.
         categorySpinner = (Spinner) view.findViewById(R.id.categorySpinner);
         final ArrayList<String> withTotal = new ArrayList<String>();
         withTotal.add("Total");
@@ -90,6 +96,8 @@ public class homeScreen extends Fragment {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         categorySpinner.setAdapter(spinnerAdapter);
 
+        // Whenever another item in the spinner is selected,
+        //   Show their values on the top.
         categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
@@ -114,6 +122,12 @@ public class homeScreen extends Fragment {
 
         });
 
+        // When the 'Add Value' button is pressed,
+        // Makes sure all fields are entered properly.
+        // Add and update:
+        //    Category (Name, Value)
+        //    Transaction (Name, Value, Location, Date)
+        //    Change the overhead value.
         addV = (Button) view.findViewById(R.id.addValue);
         addV.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -136,6 +150,7 @@ public class homeScreen extends Fragment {
             }
         });
 
+        // Similar to 'Add Value'
         subV = (Button) view.findViewById(R.id.subtractValue);
         subV.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,6 +176,7 @@ public class homeScreen extends Fragment {
         return view;
     }
 
+    // Method to make it so that the EditText for balances only accepts up to 2 decimal places.
     public class DecimalDigitsInputFilter implements InputFilter {
 
         Pattern mPattern;

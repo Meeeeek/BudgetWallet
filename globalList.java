@@ -8,6 +8,7 @@ import java.util.ArrayList;
  * Created by Michael Kim on 5/24/2017.
  */
 
+// Provides global declaration for ArrayLists for categories, their names, and all transactions.
 public class globalList extends Application {
 
     private ArrayList<Category> categories;

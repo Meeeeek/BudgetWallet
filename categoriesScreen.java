@@ -30,12 +30,13 @@ public class categoriesScreen extends Fragment {
     ArrayList<String> categoryNames;
     ArrayList<Transaction> transactions;
 
+    // Decimal format for viewing values in proper monetary format.
     DecimalFormat df = new DecimalFormat("#.00");
 
     // Widget declaration.
     Button addC;
 
-    // For the listview.
+    // ListView declaration.
     Context context;
     ListView listOfCategories;
 
@@ -46,7 +47,7 @@ public class categoriesScreen extends Fragment {
         getActivity().setTitle("Categories Screen");
     }
 
-    // Instantiate the global ArrayList and populate it if already populated.
+    // Instantiate the global ArrayLists and populate it if already populated.
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,13 +74,12 @@ public class categoriesScreen extends Fragment {
         }
     }
 
-    // Instantiate widgets.
-    // Show the custom list view.
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_categories_screen, container, false);
 
+        // View and populate the list of categories.
         listOfCategories = (ListView) view.findViewById(R.id.listOfCategories);
         final categoryAdapter categoryAdapter = new categoryAdapter();
         listOfCategories.setAdapter(categoryAdapter);
@@ -95,6 +95,11 @@ public class categoriesScreen extends Fragment {
 
                 addDialog.setTitle("Add a Category");
                 addDialog.setView(dialogView)
+                        // When clicking the add category button
+                        // Makes sure that the category's name doesn't already exist.
+                        // Create a new category with fields:
+                        //      Name
+                        //      Balance
                         .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int whichButton) {
@@ -125,6 +130,8 @@ public class categoriesScreen extends Fragment {
         return view;
     }
 
+    // Adapter for populating the category ListView with its name and its value.
+    // Each category contains a 'Delete Category' button that deletes itself and all the transactions under its name.
     class categoryAdapter extends BaseAdapter{
 
         @Override
@@ -199,6 +206,7 @@ public class categoriesScreen extends Fragment {
         }
     }
 
+    // Method to make it so that the EditText for balances only accepts up to 2 decimal places.
     public class DecimalDigitsInputFilter implements InputFilter {
 
         Pattern mPattern;

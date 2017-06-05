@@ -69,6 +69,7 @@ public class Drawer extends AppCompatActivity
     private void displaySelectedScreen(int id){
         Fragment fragment = null;
 
+        // When clicking a tab, move into another fragment.
         switch (id){
             case R.id.moveHome:
                 fragment = new homeScreen();
