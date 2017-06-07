@@ -19,7 +19,8 @@
         android:layout_width="300sp"
         android:layout_height="250dp"
         android:layout_below="@+id/largestTransStat"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="12dp" />
 
     <TextView
         android:id="@+id/mostSpentStat"
@@ -28,7 +29,7 @@
         android:layout_alignStart="@+id/listOfStatistics"
         android:layout_below="@+id/categorySpinner"
         android:layout_marginTop="22dp"
-        android:text="Category with Most Money Spent :" />
+        android:text="Total Money Spent :" />
 
     <TextView
         android:id="@+id/frequentlyVisitedStat"
@@ -43,49 +44,59 @@
         android:id="@+id/largestTransAddedStat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/frequentlyVisitedStat"
+        android:layout_marginTop="11dp"
+        android:text="Largest Sum Added :"
         android:layout_below="@+id/frequentlyVisitedStat"
-        android:layout_marginTop="12dp"
-        android:text="Largest Sum Added :" />
+        android:layout_alignStart="@+id/frequentlyVisitedStat" />
 
     <TextView
         android:id="@+id/largestTransStat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/largestTransAddedStat"
+        android:layout_marginTop="11dp"
+        android:text="Largest Transaction :"
         android:layout_below="@+id/largestTransAddedStat"
-        android:layout_marginTop="14dp"
-        android:text="Largest Transaction :" />
+        android:layout_alignStart="@+id/listOfStatistics" />
 
     <TextView
         android:id="@+id/mSS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/listOfStatistics"
-        android:layout_alignTop="@+id/mostSpentStat"
-        android:text="TextView" />
+        android:text="TextView"
+        android:textAlignment="viewEnd"
+        android:textStyle="bold"
+        android:layout_above="@+id/frequentlyVisitedStat"
+        android:layout_alignEnd="@+id/listOfStatistics" />
 
     <TextView
         android:id="@+id/fVS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/mSS"
-        android:layout_alignTop="@+id/frequentlyVisitedStat"
-        android:text="TextView" />
+        android:text="TextView"
+        android:textAlignment="viewEnd"
+        android:textStyle="bold"
+        android:layout_marginEnd="11dp"
+        android:layout_alignBaseline="@+id/frequentlyVisitedStat"
+        android:layout_alignBottom="@+id/frequentlyVisitedStat"
+        android:layout_alignEnd="@+id/mSS" />
 
     <TextView
         android:id="@+id/lTAS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/fVS"
-        android:layout_alignTop="@+id/largestTransAddedStat"
-        android:text="TextView" />
+        android:text="TextView"
+        android:textAlignment="viewEnd"
+        android:textStyle="bold"
+        android:layout_above="@+id/largestTransStat"
+        android:layout_alignStart="@+id/mSS" />
 
     <TextView
         android:id="@+id/lTS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/lTAS"
-        android:layout_alignTop="@+id/largestTransStat"
-        android:text="TextView" />
+        android:text="TextView"
+        android:textAlignment="viewEnd"
+        android:textStyle="bold"
+        android:layout_above="@+id/listOfStatistics"
+        android:layout_alignStart="@+id/lTAS" />
 </RelativeLayout>
