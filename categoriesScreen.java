@@ -2,6 +2,8 @@ package michaelkim.budgetingandwalletbased;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,27 +20,28 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class categoriesScreen extends Fragment {
+    // ListView declaration.
+    Context context;
+    ListView listOfCategories;
+
+    // Database declaration.
+    transactionDatabase transactionDatabase;
+    categoryDatabase categoryDatabase;
+    SQLiteDatabase sqLiteDatabase;
+    Cursor cursor;
 
     // Global ArrayList value.
     ArrayList<Category> categories;
     ArrayList<String> categoryNames;
     ArrayList<Transaction> transactions;
 
-    // Decimal format for viewing values in proper monetary format.
-    DecimalFormat df = new DecimalFormat("#.00");
-
     // Widget declaration.
     Button addC;
-
-    // ListView declaration.
-    Context context;
-    ListView listOfCategories;
 
     // Mainly used for the toolbar name change.
     @Override
@@ -52,6 +55,32 @@ public class categoriesScreen extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getActivity();
+
+        // Database Information
+        categoryDatabase = new categoryDatabase(getActivity().getApplicationContext());
+        sqLiteDatabase = categoryDatabase.getReadableDatabase();
+        cursor = categoryDatabase.getCategoryInfo(sqLiteDatabase);
+
+        categories = new ArrayList<Category>();
+        categoryNames = new ArrayList<String>();
+        if (cursor.moveToFirst()){
+            do{
+
+                String name, value;
+                name = cursor.getString(0);
+                value = cursor.getString(1);
+
+                categories.add(new Category(name, Double.parseDouble(value)));
+                categoryNames.add(name);
+
+            }
+            while(cursor.moveToNext());
+
+            ((globalList) getActivity().getApplication()).setList(categories);
+            ((globalList) getActivity().getApplication()).setNames(categoryNames);
+        }
+
+        // Retrieve base values from the database.
         if(((globalList) getActivity().getApplication()).getList() == null){
             categories = new ArrayList<Category>();
         }
@@ -112,10 +141,22 @@ public class categoriesScreen extends Fragment {
                                 String name = nameField.getText().toString();
                                 String value = valueField.getText().toString();
                                 if (!categoryNames.contains(name)) {
+                                    // Add the category + category name into ArrayLists.
                                     categories.add(new Category(name, Double.parseDouble(value)));
                                     categoryNames.add(name);
+
+                                    // Save the category list.
+                                    categoryDatabase = new categoryDatabase(context);
+                                    sqLiteDatabase = categoryDatabase.getWritableDatabase();
+                                    categoryDatabase.addCategoryInfo(name, value, sqLiteDatabase);
+                                    Toast.makeText(context, "Data Saved.", Toast.LENGTH_SHORT).show();
+                                    categoryDatabase.close();
+
+                                    // Save the category + category name into the global variables.
                                     ((globalList) getActivity().getApplication()).setList(categories);
                                     ((globalList) getActivity().getApplication()).setNames(categoryNames);
+
+                                    // Update the ListView.
                                     categoryAdapter.notifyDataSetChanged();
                                 }
                                 else{
@@ -177,12 +218,26 @@ public class categoriesScreen extends Fragment {
                         deleteConfirmation.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int whichButton) {
+                                String categoryName = categoryNames.get(i);
+
+                                // Delete any transactions that are from the category.
+                                transactionDatabase = new transactionDatabase(context);
+                                sqLiteDatabase = transactionDatabase.getReadableDatabase();
+
                                 for (int j = 0; j < transactions.size(); j++){
-                                    if (transactions.get(j).name.equals(categoryNames.get(i))){
+                                    if (transactions.get(j).name.equals(categoryName)){
                                         transactions.remove(j);
+                                        transactionDatabase.deleteTrans(categoryName, sqLiteDatabase);
                                         j--;
                                     }
                                 }
+
+                                // Delete category from the database.
+                                categoryDatabase = new categoryDatabase(context);
+                                sqLiteDatabase = categoryDatabase.getReadableDatabase();
+                                categoryDatabase.deleteCategory(categories.get(i).name, sqLiteDatabase);
+                                Toast.makeText(context, "Category Deleted", Toast.LENGTH_SHORT).show();
+
                                 categories.remove(i);
                                 categoryNames.remove(i);
                                 ((globalList) getActivity().getApplication()).setList(categories);
@@ -193,6 +248,12 @@ public class categoriesScreen extends Fragment {
                         deleteConfirmation.setNegativeButton("Cancel", null).show();
                     }
                     else{
+                        // Delete category from the database.
+                        categoryDatabase = new categoryDatabase(context);
+                        sqLiteDatabase = categoryDatabase.getReadableDatabase();
+                        categoryDatabase.deleteCategory(categories.get(i).name, sqLiteDatabase);
+                        Toast.makeText(context, "Category Deleted", Toast.LENGTH_SHORT).show();
+
                         categories.remove(i);
                         categoryNames.remove(i);
                         ((globalList) getActivity().getApplication()).setList(categories);

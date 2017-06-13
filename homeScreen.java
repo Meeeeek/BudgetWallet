@@ -1,5 +1,8 @@
 package michaelkim.budgetingandwalletbased;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -30,6 +33,12 @@ public class homeScreen extends Fragment {
     EditText inputV, locationS;
     TextView totalValue;
 
+    // Database Retrieval Information.
+    categoryDatabase categoryDatabase;
+    transactionDatabase transactionDatabase;
+    SQLiteDatabase sqLiteDatabase;
+    Cursor cursor;
+
     // Information to grab the current date for transactions.
     Calendar calendar = Calendar.getInstance();
     SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
@@ -38,6 +47,7 @@ public class homeScreen extends Fragment {
     ArrayList<Category> categories;
     ArrayList<String> categoryNames;
     ArrayList<Transaction> transactions;
+    Context context;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -49,23 +59,70 @@ public class homeScreen extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = getActivity();
+
+        // Database Information
+        categoryDatabase = new categoryDatabase(getActivity().getApplicationContext());
+        sqLiteDatabase = categoryDatabase.getReadableDatabase();
+        cursor = categoryDatabase.getCategoryInfo(sqLiteDatabase);
+
+        categories = new ArrayList<>();
+        categoryNames = new ArrayList<>();
+        if (cursor.moveToFirst()){
+            do{
+
+                String name, value;
+                name = cursor.getString(0);
+                value = cursor.getString(1);
+
+                categories.add(new Category(name, Double.parseDouble(value)));
+                categoryNames.add(name);
+
+            }
+            while(cursor.moveToNext());
+
+            ((globalList) getActivity().getApplication()).setList(categories);
+            ((globalList) getActivity().getApplication()).setNames(categoryNames);
+        }
+
+        transactionDatabase = new transactionDatabase(getActivity().getApplicationContext());
+        sqLiteDatabase = transactionDatabase.getReadableDatabase();
+        cursor = transactionDatabase.getTransInfo(sqLiteDatabase);
+
+        transactions = new ArrayList<>();
+        if (cursor.moveToFirst()){
+            do{
+
+                String name, value, location, date;
+                name = cursor.getString(0);
+                value = cursor.getString(1);
+                location = cursor.getString(2);
+                date = cursor.getString(3);
+
+                transactions.add(new Transaction(name, value, location, date));
+
+            }
+            while(cursor.moveToNext());
+
+            ((globalList) getActivity().getApplication()).setTransactions(transactions);
+        }
 
         if(((globalList) getActivity().getApplication()).getList() == null){
-            categories = new ArrayList<Category>();
+            categories = new ArrayList<>();
         }
         else{
             categories = ((globalList) getActivity().getApplication()).getList();
         }
 
         if (((globalList) getActivity().getApplication()).getNames() == null){
-            categoryNames = new ArrayList<String>();
+            categoryNames = new ArrayList<>();
         }
         else{
             categoryNames = ((globalList) getActivity().getApplication()).getNames();
         }
 
         if (((globalList) getActivity().getApplication()).getTransactions() == null){
-            transactions = new ArrayList<Transaction>();
+            transactions = new ArrayList<>();
         }
         else{
             transactions = ((globalList) getActivity().getApplication()).getTransactions();
@@ -89,10 +146,10 @@ public class homeScreen extends Fragment {
 
         // Instantiate the category spinner and populate it with its category names.
         categorySpinner = (Spinner) view.findViewById(R.id.categorySpinner);
-        final ArrayList<String> withTotal = new ArrayList<String>();
+        final ArrayList<String> withTotal = new ArrayList<>();
         withTotal.add("Total");
         withTotal.addAll(categoryNames);
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, withTotal);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_spinner_item, withTotal);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         categorySpinner.setAdapter(spinnerAdapter);
 
@@ -139,7 +196,25 @@ public class homeScreen extends Fragment {
                     Toast.makeText(getContext(), "All fields must be entered.", Toast.LENGTH_SHORT).show();
                 }
                 else{
+                    // Save the transaction list.
+                    transactionDatabase = new transactionDatabase(context);
+                    sqLiteDatabase = transactionDatabase.getWritableDatabase();
+                    transactionDatabase.addTransInfo(categories.get(selectedPosition).name,
+                            "+ $" + inputV.getText().toString(),
+                            locationS.getText().toString(),
+                            df.format(calendar.getTime()),
+                            sqLiteDatabase);
+                    Toast.makeText(context, "Data Saved.", Toast.LENGTH_SHORT).show();
+                    transactionDatabase.close();
+
                     categories.get(selectedPosition).value = categories.get(selectedPosition).value + insertedValue;
+
+                    // Update the category's value.
+                    categoryDatabase = new categoryDatabase(context);
+                    sqLiteDatabase = categoryDatabase.getWritableDatabase();
+                    int count = categoryDatabase.updateCategory(categories.get(selectedPosition).name, Double.toString(categories.get(selectedPosition).value), sqLiteDatabase);
+                    Toast.makeText(context, count + " category updated.", Toast.LENGTH_SHORT).show();
+
                     transactions.add(new Transaction(categories.get(selectedPosition).name, "+ $" + inputV.getText().toString(), locationS.getText().toString(), df.format(calendar.getTime())));
                     ((globalList) getActivity().getApplication()).setList(categories);
                     ((globalList) getActivity().getApplication()).setTransactions(transactions);
@@ -162,7 +237,25 @@ public class homeScreen extends Fragment {
                     Toast.makeText(getContext(), "All fields must be entered.", Toast.LENGTH_SHORT).show();
                 }
                 else{
+                    // Save the transaction list.
+                    transactionDatabase = new transactionDatabase(context);
+                    sqLiteDatabase = transactionDatabase.getWritableDatabase();
+                    transactionDatabase.addTransInfo(categories.get(selectedPosition).name,
+                            "- $" + inputV.getText().toString(),
+                            locationS.getText().toString(),
+                            df.format(calendar.getTime()),
+                            sqLiteDatabase);
+                    Toast.makeText(context, "Data Saved.", Toast.LENGTH_SHORT).show();
+                    transactionDatabase.close();
+
                     categories.get(selectedPosition).value = categories.get(selectedPosition).value - insertedValue;
+
+                    // Update the category's value.
+                    categoryDatabase = new categoryDatabase(context);
+                    sqLiteDatabase = categoryDatabase.getWritableDatabase();
+                    int count = categoryDatabase.updateCategory(categories.get(selectedPosition).name, Double.toString(categories.get(selectedPosition).value), sqLiteDatabase);
+                    Toast.makeText(context, count + " category updated.", Toast.LENGTH_SHORT).show();
+
                     transactions.add(new Transaction(categories.get(selectedPosition).name, "- $" + inputV.getText().toString(), locationS.getText().toString(), df.format(calendar.getTime())));
                     ((globalList) getActivity().getApplication()).setList(categories);
                     ((globalList) getActivity().getApplication()).setTransactions(transactions);
@@ -177,11 +270,11 @@ public class homeScreen extends Fragment {
     }
 
     // Method to make it so that the EditText for balances only accepts up to 2 decimal places.
-    public class DecimalDigitsInputFilter implements InputFilter {
+    private class DecimalDigitsInputFilter implements InputFilter {
 
         Pattern mPattern;
 
-        public DecimalDigitsInputFilter(int digitsBeforeZero,int digitsAfterZero) {
+        private DecimalDigitsInputFilter(int digitsBeforeZero,int digitsAfterZero) {
             mPattern=Pattern.compile("[0-9]{0," + (digitsBeforeZero-1) + "}+((\\.[0-9]{0," + (digitsAfterZero-1) + "})?)||(\\.)?");
         }
 

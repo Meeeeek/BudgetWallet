@@ -1,5 +1,7 @@
 package michaelkim.budgetingandwalletbased;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -23,6 +25,11 @@ public class transactionScreen extends Fragment {
     ArrayList<String> categoryNames;
     ArrayList<Transaction> transactions;
 
+    // Database declaration and information retrieval.
+    transactionDatabase transactionDatabase;
+    SQLiteDatabase sqLiteDatabase;
+    Cursor cursor;
+
     // ArrayList that helps to configure the ListView.
     ArrayList<Transaction> tempTrans;
 
@@ -39,6 +46,28 @@ public class transactionScreen extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        transactionDatabase = new transactionDatabase(getActivity().getApplicationContext());
+        sqLiteDatabase = transactionDatabase.getReadableDatabase();
+        cursor = transactionDatabase.getTransInfo(sqLiteDatabase);
+
+        transactions = new ArrayList<>();
+        if (cursor.moveToFirst()){
+            do{
+
+                String name, value, location, date;
+                name = cursor.getString(0);
+                value = cursor.getString(1);
+                location = cursor.getString(2);
+                date = cursor.getString(3);
+
+                transactions.add(new Transaction(name, value, location, date));
+
+            }
+            while(cursor.moveToNext());
+
+            ((globalList) getActivity().getApplication()).setTransactions(transactions);
+        }
 
         if(((globalList) getActivity().getApplication()).getList() == null){
             categories = new ArrayList<Category>();
